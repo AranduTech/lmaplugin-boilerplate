@@ -1,0 +1,1 @@
+# lmaplugin-boilerplate
