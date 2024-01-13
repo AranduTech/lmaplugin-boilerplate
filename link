@@ -1,0 +1,79 @@
+#!/bin/bash
+
+# This script creates symlinks for the external dependencies of the library
+# in the node_modules directory of the consumer project.
+# You can use this command to develop the library using a local laravel project
+# as a consumer. This way you can test the library in the context of the consumer
+# project without having to publish it to npm.
+
+# To run with a local project, you need to:
+
+# 1. On the first time, run `npm link` in the library directory, where this 
+# script is located. This will create a symlink in the global node_modules
+# directory that points to the library directory.
+
+# 2. Make this script executable with `sudo chmod +x link`
+
+# 3. Make a clean `npm install` in both repositories. Remove the `node_modules`
+# directory from both repositories before running `npm install`.
+
+# 4. Run this script with the path to the consumer project as an argument.
+# This will make this project use dependencies from the consumer project,
+# preventing issues with multiple versions of the same dependency.
+# Example: `./link /var/www/html/my-laravel-project`
+
+# 5. Run a build in the library directory with `npm run build`. There should
+# be no errors displayed.
+
+# 6. In the consumer project, run `npm link lmaplugin-boilerplate`. This will
+# create a symlink in the consumer project's node_modules directory that points
+# to the library directory.
+
+# 7. Run a build in the consumer project directory with `npm run build` and
+# check if the library is working as expected.
+
+# Tip: You can use `npm run start` in the library directory to run the library
+# in development mode. In the consumer project, you should use `npx vite --force`
+# to run the consumer project in development mode. The `--force` flag is needed
+# because vite will not reload dependencies from the symlinked library directory
+# by default. This way, you can make changes to the library and see them
+# reflected in the consumer project without having to rebuild at every change.
+
+# Specify your dependencies
+declare -a dependencies=("react"
+                        "react-dom"
+                        "@mui/base"
+                        "@mui/core-downloads-tracker"
+                        "@mui/material"
+                        "@mui/private-theming"
+                        "@mui/styled-engine"
+                        "@mui/system"
+                        "@mui/types"
+                        "@mui/utils"
+                        "@emotion/babel-plugin"
+                        "@emotion/cache"
+                        "@emotion/hash"
+                        "@emotion/is-prop-valid"
+                        "@emotion/memoize"
+                        "@emotion/react"
+                        "@emotion/serialize"
+                        "@emotion/sheet"
+                        "@emotion/styled"
+                        "@emotion/unitless"
+                        "@emotion/use-insertion-effect-with-fallbacks"
+                        "@emotion/utils"
+                        "@emotion/weak-memoize")
+
+# Get the argument - path to the consumer project
+consumer_project_path=$1
+
+# Path to the node_modules directory of the consumer project
+node_modules_path="$consumer_project_path/node_modules"
+
+# Loop over dependencies and create symlinks for each one
+for dep in "${dependencies[@]}"
+do
+   echo "Linking $dep"
+   rm -rf "node_modules/$dep"
+   ln -s "$node_modules_path/$dep" "node_modules/$dep"
+done
